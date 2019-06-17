@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 
-#include "vmisa.h"
+#include "vmisa.c"
 
 /* 
     Virtual machine description

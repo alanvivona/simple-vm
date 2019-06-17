@@ -1,7 +1,6 @@
 #ifndef VM_ISA_H
 #define VM_ISA_H
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
