@@ -5,27 +5,27 @@ import (
 	"sort"
 )
 
-type AbstractCPU map[uint]int
-
 type VirtualCPU struct {
-	State AbstractCPU
-	Arch  map[string]uint
-	Model string
+	Arch      map[string]uint
+	Registers map[uint]byte
+	Model     string
+	SPIndex   uint
+	PCIndex   uint
 }
 
-func (c VirtualCPU) Set(where uint, what int) error {
-	if where > uint(len(c.State)) {
-		return fmt.Errorf("Unrecognized register index %d", where)
+func (c VirtualCPU) Set(registerIndex uint, value byte) error {
+	if registerIndex > uint(len(c.Registers)) {
+		return fmt.Errorf("Unrecognized register index 0x%x", registerIndex)
 	}
-	c.State[where] = what
+	c.Registers[registerIndex] = value
 	return nil
 }
 
-func (c VirtualCPU) Get(index uint) (int, error) {
-	if index > uint(len(c.State)) {
-		return 0, fmt.Errorf("Unrecognized register index %d", index)
+func (c VirtualCPU) Get(index uint) (byte, error) {
+	if index > uint(len(c.Registers)) {
+		return 0, fmt.Errorf("Unrecognized register index 0x%x", index)
 	}
-	return c.State[index], nil
+	return c.Registers[index], nil
 }
 
 func (c VirtualCPU) Print() {
@@ -37,7 +37,7 @@ func (c VirtualCPU) Print() {
 	sort.Strings(registreNames)
 	for _, name := range registreNames {
 		index := c.Arch[name]
-		fmt.Printf("%12s: 0x%015x", name, c.State[index])
+		fmt.Printf("%12s: 0x%015x", name, c.Registers[index])
 		if index%2 == 0 {
 			fmt.Println()
 		}

@@ -34,12 +34,14 @@ func createCPU(model string) (VirtualCPU, error) {
 	switch model {
 	case "fakeone":
 		registers := []string{"ra", "rb", "rc", "rd", "sp", "pc"}
-		newCPU.State = make(AbstractCPU)
+		newCPU.Registers = make(map[uint]byte)
 		newCPU.Arch = make(map[string]uint)
 		for i, name := range registers {
 			newCPU.Arch[name] = uint(i)
-			newCPU.State[uint(i)] = 0
+			newCPU.Registers[uint(i)] = 0
 		}
+		newCPU.PCIndex = 5
+		newCPU.SPIndex = 4
 	default:
 		return newCPU, fmt.Errorf("Model %s not found", model)
 	}
