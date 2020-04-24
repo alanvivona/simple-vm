@@ -1,68 +1,90 @@
 package isa
 
 import (
+	"fmt"
+
 	"../hardware"
 )
 
-type Executable func(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)
+type Instructions map[string]Executable
 
-type Instructions map[string]Executable{
-	"start": start,
-	"end": end,
-	"set": set,
-	"put": put,
-	"get": get,
-	"cmp": cmp,
-	"if": ifExecute,
-	"dec": dec,
-	"inc": inc,
-	"add": add,
-	"sub": sub,
-	"call": call,
-	"ret": ret,
+type Executable interface {
+	Exec(h *hardware.VirtualHardware, args []int) (bool, error)
 }
 
-func start(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	*cpu = hardware.AbstractCPU{
-		RA, RB, RC, RD : 0,
-		SP             : 0,
-		PC             : 0,
+type Microcode struct {
+	Def   func(h *hardware.VirtualHardware, args []int) (bool, error)
+	ArgsQ uint
+}
+
+func (m Microcode) Exec(h *hardware.VirtualHardware, args []int) (bool, error) {
+	if uint(len(args)) != m.ArgsQ {
+		return false, fmt.Errorf("Mismatch args quantity. Have: %d %+v, Want: %d", len(args), args, m.ArgsQ)
+	}
+	return m.Def(h, args)
+}
+
+func Create() Instructions {
+	return Instructions{
+		"start": start,
+		"end":   end,
+		//"set":   set,
+		//"put":   put,
+		//"get":   get,
+		//"cmp":   cmp,
+		//"if":    ifExecute,
+		//"dec":   dec,
+		//"inc":   inc,
+		//"add":   add,
+		//"sub":   sub,
+		//"call":  call,
+		//"ret":   ret,
 	}
 }
 
-func end(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	cpu = nil
-	mem = nil
+var start = Microcode{
+	Def: func(h *hardware.VirtualHardware, args []int) (bool, error) {
+		for k := range h.CPU.State {
+			h.CPU.State[k] = 0
+		}
+		return true, nil
+	},
 }
 
-func set(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
+var end = Microcode{
+	Def: func(h *hardware.VirtualHardware, args []int) (bool, error) {
+		return false, nil
+	},
 }
 
-func put(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
-}
-
-func get(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
-}
-
-func cmp(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
-}
-
-func ifExecute(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
-}
-
-func add(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
-}
-
-func sub(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	
-}
-
-func dec(cpu *hardware.AbstractCPU, mem *hardware.MadeUpMemory, args []int64) (int64, error)  {
-	sub(cpu, mem, args[0], 1)
-}
+//func set(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func put(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func get(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func cmp(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func ifExecute(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func add(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func sub(h *hardware.VirtualHardware, args []int) (bool, error) {
+//
+//}
+//
+//func dec(h *hardware.VirtualHardware, args []int) (bool, error) {
+////sub(cpu, mem, args[0], 1)
+//}

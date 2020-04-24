@@ -77,8 +77,8 @@ end:    Stop/finish execution
         end                 ff 00 00
 
 set:    Copy immediate or register value into destination
-        set  ra, rb         01 00 01
-        set  ra, 0xff       f1 00 ff
+        set  ra rb         01 00 01
+        set  ra 0xff       f1 00 ff
 
 put:    Saves the value into the stack
         put ra              02 00 00
@@ -92,8 +92,8 @@ get:    Retreives the value from the stack into the register
         get rc              03 02 00
 
 cmp:    Compares values
-        cmp ra, 0xff        f4 00 ff
-        cmp ra, rb          04 01 00
+        cmp ra 0xff        f4 00 ff
+        cmp ra rb          04 01 00
 
 if:     If the register or value is zero
         the next instruction following the if won't be ejecuted  
@@ -107,19 +107,19 @@ dec:    Decrement register vale
         dec ra              06 00 00
         dec rb              06 01 00
         dec rc              06 02 00
-        dec ra, 1           f6 00 01
+        dec ra 1           f6 00 01
 
 add:    Add values
-        add ra, rb          07 00 01
-        add rb, ra          07 01 00
-        add rb, rc          07 01 02
-        add ra, 0xff        f7 00 ff
-        add rb, 0xff        f7 01 ff
+        add ra rb          07 00 01
+        add rb ra          07 01 00
+        add rb rc          07 01 02
+        add ra 0xff        f7 00 ff
+        add rb 0xff        f7 01 ff
 
 call equivalent:   
         put pc              02 00 ff
         put sp              02 00 88
-        set pc, 0xff        f1 ff ff
+        set pc 0xff        f1 ff ff
 
 ret equivalent:
         get sp              03 00 88
