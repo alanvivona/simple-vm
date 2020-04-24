@@ -18,15 +18,17 @@ func main() {
 	}
 	logrus.Infof("Created Hardware")
 	logrus.Infof("CPU: %s", vh.CPU.Model)
-	vh.CPU.Print()
 	logrus.Infof("Memory: %d", len(vh.Mem))
-	vh.Mem.Print()
 
 	instruction := isa.Create()
 
 	code := []string{
 		"start",
-		"start 1",
+		"set ra 1",
+		"set 1 2",
+		"set rc 0x3",
+		"set 3 0x4",
+		"set pc 0xfffffffffffffff",
 		"end",
 	}
 
@@ -41,6 +43,9 @@ func main() {
 
 		args := []int{}
 		for _, lineSlice := range line[1:] {
+			if strings.HasPrefix(lineSlice, "0x") {
+				lineSlice = lineSlice[2:]
+			}
 			ImmediateValue, err := strconv.ParseInt(lineSlice, 16, 64)
 			if err == nil {
 				args = append(args, int(ImmediateValue))
@@ -56,8 +61,13 @@ func main() {
 		}
 
 		keepGoing, err := instruction.Exec(&vh, args)
+
+		vh.CPU.Print()
+		vh.Mem.Print()
+
 		if err != nil {
 			logrus.Error(err)
+			break
 		}
 		if !keepGoing {
 			break

@@ -28,7 +28,7 @@ func Create() Instructions {
 	return Instructions{
 		"start": start,
 		"end":   end,
-		//"set":   set,
+		"set":   set,
 		//"put":   put,
 		//"get":   get,
 		//"cmp":   cmp,
@@ -49,12 +49,21 @@ var start = Microcode{
 		}
 		return true, nil
 	},
+	ArgsQ: 0,
 }
 
 var end = Microcode{
 	Def: func(h *hardware.VirtualHardware, args []int) (bool, error) {
 		return false, nil
 	},
+	ArgsQ: 0,
+}
+
+var set = Microcode{
+	Def: func(h *hardware.VirtualHardware, args []int) (bool, error) {
+		return true, h.CPU.Set(uint(args[0]), args[1])
+	},
+	ArgsQ: 2,
 }
 
 //func set(h *hardware.VirtualHardware, args []int) (bool, error) {
