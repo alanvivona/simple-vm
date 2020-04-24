@@ -15,6 +15,7 @@ type Executable interface {
 type Microcode struct {
 	Def        func(h *hardware.VirtualHardware, args []byte) error
 	IsMemWrite bool
+	IsExecFlow bool
 }
 
 func (m Microcode) Exec(h *hardware.VirtualHardware, args []byte) error {
@@ -25,7 +26,9 @@ func (m Microcode) Exec(h *hardware.VirtualHardware, args []byte) error {
 		}
 	}
 	err := m.Def(h, args)
-	h.CPU.Registers[h.CPU.PCIndex] += InstructionSize
+	if !m.IsExecFlow {
+		h.CPU.Registers[h.CPU.PCIndex] += InstructionSize
+	}
 	return err
 }
 
@@ -33,46 +36,68 @@ const InstructionSize = 3
 
 func Create() Instructions {
 	return Instructions{
-		// Execution
+		// Setup
 		0x00: start,
-		0xff: end,
+		0x01: end,
 
 		// Set registers
-		0x01: setr,
-		0xf1: setv,
+		0x11: setr,
+		0x12: setv,
 
 		// Stack
-		0x02: putr,
-		0xf2: putv,
-		0x03: get,
-
-		// Control flow
-		//"cmp":   cmp,
-		//"if":    ifExecute,
+		0x20: putr,
+		0x21: putv,
+		0x22: get,
 
 		// Arithmetic
-		0xf6: addv,
-		0x06: addr,
-		0xf7: subv,
-		0x07: subr,
-		0x08: dec,
-		0x09: inc,
+		0x30: addr,
+		0x31: addv,
+		0x32: subr,
+		0x33: subv,
+		0x34: dec,
+		0x35: inc,
 
 		// Logic
-		0x0a: not,
-		0x0b: neg,
+		0x40: not,
+		0x41: neg,
+		0x42: andr,
+		0x43: andv,
+		0x44: orr,
+		0x45: orv,
+		0x46: xorr,
+		0x47: xorv,
 
-		0x0c: andr,
-		0xfc: andv,
-		0x0d: orr,
-		0xfd: orv,
-		0x0e: xorr,
-		0xfe: xorv,
-
-		// Subroutines
-		//"call":  call,
-		//"ret":   ret,
+		// Program Flow
+		0x50: jmp,
+		0x51: jer,
+		0x52: jev,
+		0x53: jner,
+		0x54: jnev,
+		0x55: call,
+		0x56: ret,
 	}
+}
+
+var jmp = Microcode{
+	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
+		return h.CPU.Set(h.CPU.PCIndex, bytecode[1])
+	},
+	IsMemWrite: false,
+	IsExecFlow: true,
+}
+
+var jev = Microcode{
+	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
+		v, err := h.CPU.Get(uint(bytecode[0]))
+		if err != nil {
+			return err
+		}
+		if v == bytecode[1] {
+			return h.CPU.Set(h.CPU.PCIndex, bytecode[1])
+		}
+	},
+	IsMemWrite: false,
+	IsExecFlow: true,
 }
 
 var not = Microcode{

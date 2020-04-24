@@ -18,14 +18,15 @@ func main() {
 		logrus.Fatal(err)
 		return
 	}
-	logrus.Infof("Created Hardware")
-	logrus.Infof("CPU: %s", vh.CPU.Model)
-	logrus.Infof("Memory: %db", len(vh.Mem))
+	logrus.Infof("Initialized Hardware")
+	logrus.Infof("CPU %s", vh.CPU.Model)
+	logrus.Infof("Memory %db", len(vh.Mem))
 
 	InstructionSet := isa.Create()
 
 	bytecode := []byte{
 		0x00, 0x00, 0x00, // start
+
 		0xf1, 0x00, 0x01, // set ra 0x01
 		0x01, 0x01, 0x00, // set rb ra
 		0xf1, 0x02, 0x02, // set rc 0x02
@@ -54,6 +55,7 @@ func main() {
 
 		0xff, 0x00, 0x00, // end
 	}
+	logrus.Infof("Loaded %db of bytecode", len(bytecode))
 
 	for true {
 		pc := vh.CPU.Registers[vh.CPU.PCIndex]

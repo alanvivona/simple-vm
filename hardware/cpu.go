@@ -37,7 +37,7 @@ func (c VirtualCPU) Print() {
 	sort.Strings(registreNames)
 	for _, name := range registreNames {
 		index := c.Arch[name]
-		fmt.Printf("%12s: 0x%015x", name, c.Registers[index])
+		fmt.Printf("%12s: 0x%02x", name, c.Registers[index])
 		if index%2 == 0 {
 			fmt.Println()
 		}
