@@ -61,9 +61,13 @@ func Create() Instructions {
 		// Logic
 		0x0a: not,
 		0x0b: neg,
-		0x0c: and,
-		0x0d: or,
-		0x0e: xor,
+
+		0x0c: andr,
+		0xfc: andv,
+		0x0d: orr,
+		0xfd: orv,
+		0x0e: xorr,
+		0xfe: xorv,
 
 		// Subroutines
 		//"call":  call,
@@ -101,19 +105,25 @@ var neg = Microcode{
 	IsMemWrite: false,
 }
 
-var or = Microcode{
+var orr = Microcode{
+	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
+		v2, err := h.CPU.Get(uint(bytecode[1]))
+		if err != nil {
+			return err
+		}
+		return orv.Def(h, []byte{bytecode[0], v2})
+	},
+	IsMemWrite: false,
+}
+
+var orv = Microcode{
 	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
 		v1, err := h.CPU.Get(uint(bytecode[0]))
 		if err != nil {
 			return err
 		}
 
-		v2, err := h.CPU.Get(uint(bytecode[1]))
-		if err != nil {
-			return err
-		}
-
-		err = h.CPU.Set(uint(bytecode[0]), v1|v2)
+		err = h.CPU.Set(uint(bytecode[0]), v1|bytecode[1])
 		if err != nil {
 			return err
 		}
@@ -122,19 +132,14 @@ var or = Microcode{
 	IsMemWrite: false,
 }
 
-var and = Microcode{
+var andv = Microcode{
 	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
 		v1, err := h.CPU.Get(uint(bytecode[0]))
 		if err != nil {
 			return err
 		}
 
-		v2, err := h.CPU.Get(uint(bytecode[1]))
-		if err != nil {
-			return err
-		}
-
-		err = h.CPU.Set(uint(bytecode[0]), v1&v2)
+		err = h.CPU.Set(uint(bytecode[0]), v1&bytecode[1])
 		if err != nil {
 			return err
 		}
@@ -143,23 +148,40 @@ var and = Microcode{
 	IsMemWrite: false,
 }
 
-var xor = Microcode{
+var andr = Microcode{
+	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
+		v2, err := h.CPU.Get(uint(bytecode[1]))
+		if err != nil {
+			return err
+		}
+		return andv.Def(h, []byte{bytecode[0], v2})
+	},
+	IsMemWrite: false,
+}
+
+var xorv = Microcode{
 	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
 		v1, err := h.CPU.Get(uint(bytecode[0]))
 		if err != nil {
 			return err
 		}
 
-		v2, err := h.CPU.Get(uint(bytecode[1]))
-		if err != nil {
-			return err
-		}
-
-		err = h.CPU.Set(uint(bytecode[0]), v1^v2)
+		err = h.CPU.Set(uint(bytecode[0]), v1^bytecode[1])
 		if err != nil {
 			return err
 		}
 		return nil
+	},
+	IsMemWrite: false,
+}
+
+var xorr = Microcode{
+	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
+		v2, err := h.CPU.Get(uint(bytecode[1]))
+		if err != nil {
+			return err
+		}
+		return xorv.Def(h, []byte{bytecode[0], v2})
 	},
 	IsMemWrite: false,
 }
