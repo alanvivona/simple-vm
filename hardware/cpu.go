@@ -6,13 +6,13 @@ import (
 
 type AbstractCPU map[uint]int
 
-type ConcreteCPU struct {
+type VirtualCPU struct {
 	State AbstractCPU
 	Arch  map[string]uint
 	Model string
 }
 
-func (c ConcreteCPU) SetByIndex(what int, where uint) error {
+func (c VirtualCPU) SetByIndex(what int, where uint) error {
 	if where > uint(len(c.State)) {
 		return fmt.Errorf("Unrecognized register index %d", where)
 	}
@@ -20,7 +20,7 @@ func (c ConcreteCPU) SetByIndex(what int, where uint) error {
 	return nil
 }
 
-func (c ConcreteCPU) SetByName(what int, where string) error {
+func (c VirtualCPU) SetByName(what int, where string) error {
 	index, exists := c.Arch[where]
 	if !exists {
 		return fmt.Errorf("Unrecognized register name %s", where)
@@ -29,14 +29,14 @@ func (c ConcreteCPU) SetByName(what int, where string) error {
 	return nil
 }
 
-func (c ConcreteCPU) GtByIndex(index uint) (int, error) {
+func (c VirtualCPU) GtByIndex(index uint) (int, error) {
 	if index > uint(len(c.State)) {
 		return 0, fmt.Errorf("Unrecognized register index %d", index)
 	}
 	return c.State[index], nil
 }
 
-func (c ConcreteCPU) GetByName(name string) (int, error) {
+func (c VirtualCPU) GetByName(name string) (int, error) {
 	index, exists := c.Arch[name]
 	if !exists {
 		return 0, fmt.Errorf("Unrecognized register name %s", name)
@@ -44,9 +44,9 @@ func (c ConcreteCPU) GetByName(name string) (int, error) {
 	return c.State[index], nil
 }
 
-func (c ConcreteCPU) Print() {
+func (c VirtualCPU) Print() {
 	fmt.Printf("= CPU state =\n")
 	for name, index := range c.Arch {
-		fmt.Printf("%s: %d\n", name, c.State[index])
+		fmt.Printf("%s: 0x%08x\n", name, c.State[index])
 	}
 }
