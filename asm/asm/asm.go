@@ -1,62 +1,12 @@
-package main
+package asm
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
-
-var testCases = []string{
-	"   set ra, rb   ",
-	"		set ra, rb		",
-	"#set ra, rb",
-	"	#set ra, rb	",
-	" #set ra, rb ",
-	"	 set	 ra	 ,	 rb	 #	 some comment",
-	"	 SeT	 rA	 ,	 Rb	 #	 some comment",
-	"	 SeT	 rA	 	 Rb	 #	 some comment",
-	"	 SeT,	 rA,	 	 Rb,	 #	 some comment",
-	"set ra 55",
-	"set ra 055", // octal
-	"set ra 111b",
-	"set ra 111B",
-	"set ra 55h",
-	"set ra 55H",
-	"set ra 0x5a",
-	"set ra 0X5A",
-	"set ra 0x5A",
-	"set set ra 0x5A",
-
-	"set ra rb rc rd",
-	"garbage",
-
-	"set ra, garbage",
-
-	"start",
-	"set ra 0x01",
-	"set rb ra",
-	"set rc 0x02",
-	"set rd rc",
-	"put ra",
-	"put 0x44",
-	"get ra",
-	"add rd 0x44",
-	"add rd ra",
-	"sub rd 0x44",
-	"sub rd ra",
-	"dec ra",
-	"inc ra",
-	"not ra",
-	"neg ra",
-	"and ra rb",
-	"and ra 0x55",
-	"or  ra rb",
-	"or  ra 0x55",
-	"xor ra rb",
-	"xor ra 0x55",
-	"end",
-}
 
 const TYPE_NUM = 0
 const TYPE_REG = 1
@@ -66,7 +16,7 @@ type instructionDef struct {
 	opByte  byte
 }
 
-func (idef instructionDef) Parse(textSlice []string) ([]byte, error) {
+func (idef instructionDef) parse(textSlice []string) ([]byte, error) {
 	bytecode := []byte{idef.opByte, 0x00, 0x00}
 
 	expectedFieldsQ := len(textSlice) - 1
@@ -109,7 +59,8 @@ func (idef instructionDef) Parse(textSlice []string) ([]byte, error) {
 			}
 			bytecode[mIndex] = byte(v)
 		default:
-			panic(fmt.Sprintf("Bad member type definition for instruction 0x%x (%s)", idef.opByte, textSlice[0]))
+			logrus.Fatalf("Bad member type definition for instruction 0x%x (%s)", idef.opByte, textSlice[0])
+			panic("Assembler definition is broken")
 		}
 	}
 
@@ -254,22 +205,7 @@ var registers = map[string]byte{
 	"pc": 0x05,
 }
 
-func main() {
-	for i, text := range testCases {
-		bytecode, errs := asm(text)
-		if errs != nil && len(errs) > 0 {
-			fmt.Printf("Failed to assemble line %d '%s'\n", i, text)
-			for _, err := range errs {
-				fmt.Println(err)
-			}
-		}
-		stringRep := make([]byte, hex.EncodedLen(len(bytecode)))
-		hex.Encode(stringRep, bytecode)
-		fmt.Printf("%d:\t%s\t# from `%s`\n", i, stringRep, text)
-	}
-}
-
-func asm(input string) ([]byte, []error) {
+func AsmLine(input string) ([]byte, []error) {
 	// Get rid of comment section
 	processedInput := strings.Split(input, "#")[0]
 	// Get rid of surrounding spaces and tabs
@@ -285,7 +221,7 @@ func asm(input string) ([]byte, []error) {
 
 	parseErrors := []error{}
 	for _, p := range mnemonics[posibleInstruction[0]] {
-		bytecode, err := p.Parse(posibleInstruction)
+		bytecode, err := p.parse(posibleInstruction)
 		if err != nil {
 			parseErrors = append(parseErrors, err)
 		} else {
