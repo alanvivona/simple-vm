@@ -79,124 +79,125 @@ var mnemonics = map[string][]instructionDef{
 	"end": []instructionDef{
 		instructionDef{
 			members: []int{},
-			opByte:  0xff,
+			opByte:  0x0f,
 		},
 	},
 
 	"set": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_REG},
-			opByte:  0x01,
+			opByte:  0x10,
 		},
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_NUM},
-			opByte:  0xf1,
+			opByte:  0x11,
 		},
 	},
 
 	"put": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG},
-			opByte:  0x02,
+			opByte:  0x20,
 		},
 		instructionDef{
 			members: []int{TYPE_NUM},
-			opByte:  0xf2,
+			opByte:  0x21,
 		},
 	},
 
 	"get": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG},
-			opByte:  0x03,
+			opByte:  0x22,
 		},
 	},
 
 	"add": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_REG},
-			opByte:  0x06,
+			opByte:  0x30,
 		},
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_NUM},
-			opByte:  0xf6,
+			opByte:  0x31,
 		},
 	},
 
 	"sub": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_REG},
-			opByte:  0x07,
+			opByte:  0x32,
 		},
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_NUM},
-			opByte:  0xf7,
+			opByte:  0x33,
 		},
 	},
 
 	"dec": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG},
-			opByte:  0x08,
+			opByte:  0x34,
 		},
 	},
 
 	"inc": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG},
-			opByte:  0x09,
+			opByte:  0x35,
 		},
 	},
 
 	"not": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG},
-			opByte:  0x0a,
+			opByte:  0x40,
 		},
 	},
 
 	"neg": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG},
-			opByte:  0x0b,
+			opByte:  0x41,
 		},
 	},
 
 	"and": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_REG},
-			opByte:  0x0c,
+			opByte:  0x42,
 		},
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_NUM},
-			opByte:  0xfc,
+			opByte:  0x43,
 		},
 	},
 
 	"or": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_REG},
-			opByte:  0x0d,
+			opByte:  0x44,
 		},
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_NUM},
-			opByte:  0xfd,
+			opByte:  0x45,
 		},
 	},
 
 	"xor": []instructionDef{
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_REG},
-			opByte:  0x0e,
+			opByte:  0x46,
 		},
 		instructionDef{
 			members: []int{TYPE_REG, TYPE_NUM},
-			opByte:  0xfe,
+			opByte:  0x47,
 		},
 	},
 }
 
 var registers = map[string]byte{
+	// this must match the VM hardware CPU register order
 	"ra": 0x00,
 	"rb": 0x01,
 	"rc": 0x02,

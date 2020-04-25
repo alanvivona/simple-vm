@@ -2,6 +2,10 @@
 I wanted to write a really simple vm just to get an idea of the inner workings of one.  
 Ended up with a fake arch, isa, assembler, dissasembler, executable file format and of course, the VM.  
 
+WIP:  
+- utils module with some function that are replicated over the different utilities  
+- better folder structure and pack it into a proper mo module + bin install  
+
 ##  Changelog  
 v1 half baked version implemented in C  
 v2 reimplemntation in go. WIP  
@@ -32,10 +36,11 @@ WIP:
 - Write the header def after finishing the "linker"  
 
 
-## Asm + "Link" to produce a yz executable file  
+## Asm + "Link" + Run a yz file inside the VM
 
-> cd out/
-> cat ../asm/sample.asm | go run ../asm/main.go -v -o sample.bin
-> go run ../link/main.go -v -i ./sample.bin -o ./sample.yz
-> cat sample.bin | xxd  
-> cat sample.yz | xxd  
+> cd out/ && rm *
+> cat ../examples/test.asm | go run ../asm/main.go -v -o test.bin  
+> go run ../link/main.go -v -i test.bin -o test.yz  
+> cat test.bin | xxd  
+> cat test.yz | xxd  
+> go run ../vm/main.go -v -i test.yz  

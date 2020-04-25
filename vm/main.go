@@ -1,17 +1,45 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 
+	"../link/link"
 	"./hardware"
 	"./isa"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	clearScreen()
+	var filePath = flag.String("i", "", "Input file path")
+	var verboseMode = flag.Bool("v", false, "Verbose output")
+	flag.Parse()
+
+	if verboseMode != nil && *verboseMode {
+		logrus.SetLevel(logrus.InfoLevel)
+	} else {
+		logrus.SetLevel(logrus.WarnLevel)
+	}
+
+	if filePath == nil || len(*filePath) < 1 {
+		logrus.Fatalf("Input file path missing")
+	}
+	inBytes, err := ioutil.ReadFile(*filePath)
+	if err != nil {
+		logrus.Error(err)
+		logrus.Fatalf("Can't read file %s", *filePath)
+	}
+
+	logrus.Info("Checking file integrity and extracting bytecode")
+	bytecode, err := link.ExtractExecutable(inBytes)
+	if err != nil {
+		logrus.Error(err)
+		logrus.Fatalf("Can't extract bytecode from file %s", *filePath)
+	}
+	logrus.Infof("Loaded %db from code section", len(bytecode))
 
 	vh, err := hardware.Create("fakeone", 48)
 	if err != nil {
@@ -19,49 +47,19 @@ func main() {
 		return
 	}
 	logrus.Infof("Initialized Hardware")
-	logrus.Infof("CPU %s", vh.CPU.Model)
-	logrus.Infof("Memory %db", len(vh.Mem))
+	logrus.Infof("CPU: %s", vh.CPU.Model)
+	logrus.Infof("Memory: %db", len(vh.Mem))
 
 	InstructionSet := isa.Create()
 
-	bytecode := []byte{
-		0x00, 0x00, 0x00, // start
-
-		0xf1, 0x00, 0x01, // set ra 0x01
-		0x01, 0x01, 0x00, // set rb ra
-		0xf1, 0x02, 0x02, // set rc 0x02
-		0x01, 0x03, 0x02, // set rd rc
-
-		0x02, 0x00, 0x00, // put ra
-		0xf2, 0x44, 0x00, // put 0x44
-		0x03, 0x00, 0x00, // get ra
-
-		0xf6, 0x03, 0x02, // add rd 0x44
-		0x06, 0x03, 0x02, // add rd ra
-		0xf7, 0x03, 0x02, // sub rd 0x44
-		0x07, 0x03, 0x02, // sub rd ra
-
-		0x08, 0x00, 0x00, // dec ra
-		0x09, 0x00, 0x00, // inc ra
-
-		0x0a, 0x00, 0x02, // not ra
-		0x0b, 0x00, 0x02, // neg ra
-		0x0c, 0x00, 0x01, // and ra rb
-		0xfc, 0x00, 0x55, // and ra 0x55
-		0x0d, 0x00, 0x01, // or  ra rb
-		0xfd, 0x00, 0x55, // or  ra 0x55
-		0x0e, 0x00, 0x01, // xor ra rb
-		0xfe, 0x00, 0x55, // xor ra 0x55
-
-		0x00, 0x00, 0x00, // jmp
-
-		0xff, 0x00, 0x00, // end
-	}
-	logrus.Infof("Loaded %db of bytecode", len(bytecode))
+	logrus.Warn("Press a key to start execution")
+	// Wait for user input to execute next instruction
+	fmt.Scanln()
 
 	for true {
+		clearScreen()
 		pc := vh.CPU.Registers[vh.CPU.PCIndex]
-		if uint(pc) >= uint(len(bytecode)-isa.InstructionSize) {
+		if uint(pc) >= uint(len(bytecode)) {
 			logrus.Fatalf("No bytecode left. End of execution at pc=0x%02x", pc)
 			break
 		}
@@ -86,7 +84,6 @@ func main() {
 
 		// Wait for user input to execute next instruction
 		fmt.Scanln()
-		clearScreen()
 	}
 	logrus.Infof("Code execution finished")
 }

@@ -38,11 +38,11 @@ func Create() Instructions {
 	return Instructions{
 		// Setup
 		0x00: start,
-		0x01: end,
+		0x0f: end,
 
 		// Set registers
-		0x11: setr,
-		0x12: setv,
+		0x10: setr,
+		0x11: setv,
 
 		// Stack
 		0x20: putr,
@@ -67,14 +67,14 @@ func Create() Instructions {
 		0x46: xorr,
 		0x47: xorv,
 
-		// Program Flow
-		0x50: jmp,
-		0x51: jer,
-		0x52: jev,
-		0x53: jner,
-		0x54: jnev,
-		0x55: call,
-		0x56: ret,
+		// Program Flow (NOT IMPLEMENTED)
+		//0x50: jmp,
+		//0x51: jer,
+		//0x52: jev,
+		//0x53: jner,
+		//0x54: jnev,
+		//0x55: call,
+		//0x56: ret,
 	}
 }
 
@@ -86,19 +86,19 @@ var jmp = Microcode{
 	IsExecFlow: true,
 }
 
-var jev = Microcode{
-	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
-		v, err := h.CPU.Get(uint(bytecode[0]))
-		if err != nil {
-			return err
-		}
-		if v == bytecode[1] {
-			return h.CPU.Set(h.CPU.PCIndex, bytecode[1])
-		}
-	},
-	IsMemWrite: false,
-	IsExecFlow: true,
-}
+//var jev = Microcode{
+//Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
+//v, err := h.CPU.Get(uint(bytecode[0]))
+//if err != nil {
+//return err
+//}
+//if v == bytecode[1] {
+//return h.CPU.Set(h.CPU.PCIndex, bytecode[1])
+//}
+//},
+//IsMemWrite: false,
+//IsExecFlow: true,
+//}
 
 var not = Microcode{
 	Def: func(h *hardware.VirtualHardware, bytecode []byte) error {
