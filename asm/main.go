@@ -49,6 +49,8 @@ func main() {
 
 	err = stdinscanner.Err()
 	FAIL(err)
+
+	logrus.Infof("OK")
 }
 
 func FAIL(err error) {
