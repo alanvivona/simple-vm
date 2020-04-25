@@ -31,6 +31,8 @@ var testCases = []string{
 	"set ra rb rc rd",
 	"garbage",
 
+	"set ra, garbage",
+
 	"start",
 	"set ra 0x01",
 	"set rb ra",
@@ -72,41 +74,57 @@ func (idef instructionDef) Parse(textSlice []string) ([]byte, error) {
 	if expectedFieldsQ != givenFieldsQ {
 		return bytecode, fmt.Errorf("Wrong number of fields on instruction '%+v'. Got &d. Expected %d", textSlice, givenFieldsQ, expectedFieldsQ)
 	}
+
 	for i, mtype := range idef.members {
 		mIndex := i + 1
 		mValue := textSlice[mIndex]
 
 		switch mtype {
 		case TYPE_REG:
-			bytecode[mIndex] = registers[mValue]
+			v, exists := registers[mValue]
+			if !exists {
+				return nil, fmt.Errorf("Unrecognized register `%s`", mValue)
+			}
+			bytecode[mIndex] = v
 		case TYPE_NUM:
 			base := 10
-			if strings.HasPrefix(mValue, "0x") || strings.HasSuffix(mValue, "h") {
+
+			if strings.HasPrefix(mValue, "0x") {
 				base = 16
+				mValue = mValue[2:]
+			} else if strings.HasSuffix(mValue, "h") {
+				base = 16
+				mValue = mValue[0 : len(mValue)-1]
 			} else if len(mValue) > 1 && strings.HasPrefix(mValue, "0") {
 				base = 8
+				mValue = mValue[1:]
 			} else if strings.HasSuffix(mValue, "b") {
 				base = 2
+				mValue = mValue[0 : len(mValue)-1]
 			}
+
 			v, err := strconv.ParseUint(mValue, base, 8)
 			if err != nil {
-				return bytecode, fmt.Errorf("Failed to parse numeric field '%s' on instruction '%+v'", mValue, textSlice)
+				return nil, fmt.Errorf("Failed to parse numeric field '%s' on instruction '%+v'", mValue, textSlice)
 			}
 			bytecode[mIndex] = byte(v)
+		default:
+			panic(fmt.Sprintf("Bad member type definition for instruction 0x%x (%s)", idef.opByte, textSlice[0]))
 		}
 	}
+
 	return bytecode, nil
 }
 
 var mnemonics = map[string][]instructionDef{
 
-	// Power
 	"start": []instructionDef{
 		instructionDef{
 			members: []int{},
 			opByte:  0x00,
 		},
 	},
+
 	"end": []instructionDef{
 		instructionDef{
 			members: []int{},
@@ -237,17 +255,17 @@ var registers = map[string]byte{
 }
 
 func main() {
-	for i, t := range testCases {
-		bytecode, errs := asm(t)
-		if errs != nil {
-			fmt.Printf("Failed to assemble line %d '%s'\n", i, t)
+	for i, text := range testCases {
+		bytecode, errs := asm(text)
+		if errs != nil && len(errs) > 0 {
+			fmt.Printf("Failed to assemble line %d '%s'\n", i, text)
 			for _, err := range errs {
 				fmt.Println(err)
 			}
 		}
 		stringRep := make([]byte, hex.EncodedLen(len(bytecode)))
 		hex.Encode(stringRep, bytecode)
-		fmt.Printf("Assemble of line %d '%s' resulted in %s\n", i, t, stringRep)
+		fmt.Printf("%d:\t%s\t# from `%s`\n", i, stringRep, text)
 	}
 }
 
@@ -266,8 +284,8 @@ func asm(input string) ([]byte, []error) {
 	}
 
 	parseErrors := []error{}
-	for _, parser := range mnemonics[posibleInstruction[0]] {
-		bytecode, err := parser.Parse(posibleInstruction)
+	for _, p := range mnemonics[posibleInstruction[0]] {
+		bytecode, err := p.Parse(posibleInstruction)
 		if err != nil {
 			parseErrors = append(parseErrors, err)
 		} else {
@@ -275,7 +293,7 @@ func asm(input string) ([]byte, []error) {
 		}
 	}
 
-	return []byte{}, parseErrors
+	return nil, parseErrors
 }
 
 func normalize(text string) []string {
