@@ -68,7 +68,7 @@ The module checks and runs an executable file.
 | | Size field | 64 integer indicating next's section size |
 | | Next section header | Label. Next section's name. Value: "code" |
 | | Section delimiter | Indicates section end. Value: 0x6060 ("ZZ") |
-| Code | |  Raw binary to be run |
+| Code | |  Raw binary |
 
 # Demo
 
