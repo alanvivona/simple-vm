@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"./link"
+	"github.com/alanvivona/simple-vm/link"
 	"github.com/sirupsen/logrus"
 )
 

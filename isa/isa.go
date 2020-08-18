@@ -3,7 +3,7 @@ package isa
 import (
 	"errors"
 
-	"../hardware"
+	"github.com/alanvivona/simple-vm/hardware"
 )
 
 type Instructions map[byte]Executable

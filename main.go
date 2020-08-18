@@ -7,9 +7,11 @@ import (
 	"os"
 	"os/exec"
 
-	"../link/link"
-	"./hardware"
-	"./isa"
+	"github.com/alanvivona/simple-vm/hardware"
+
+	"github.com/alanvivona/simple-vm/isa"
+	"github.com/alanvivona/simple-vm/link/link"
+
 	"github.com/sirupsen/logrus"
 )
 

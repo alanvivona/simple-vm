@@ -6,7 +6,7 @@ import (
 	"flag"
 	"os"
 
-	"./asm"
+	"github.com/alanvivona/simple-vm/asm/asm"
 	"github.com/sirupsen/logrus"
 )
 
