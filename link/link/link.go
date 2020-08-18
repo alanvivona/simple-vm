@@ -13,7 +13,7 @@ import (
 
 type header struct {
 	Signature    [2]byte  // [2]byte{0x59,0x59}
-	Sha512sum    [64]byte // Fingerprint of publick key used for encryption
+	Sha512sum    [64]byte // Checksum
 	Size         uint64
 	CodeMark     string  // "code"
 	EndDelimiter [2]byte // [2]byte{0x60,0x60}
