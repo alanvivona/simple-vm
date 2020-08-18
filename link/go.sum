@@ -1,7 +1,3 @@
-github.com/alanvivona/simple-vm/asm v0.0.0-20200818122159-417a6a69092b h1:SEsTve4RKU/vYjfqBoafLWuBuv07BT619pHVWZED068=
-github.com/alanvivona/simple-vm/asm v0.0.0-20200818122159-417a6a69092b/go.mod h1:LKIRguMHvQMP2T4QzM9aEyLmAtNom0UshUbDQw4BXtI=
-github.com/alanvivona/simple-vm/link v0.0.0-20200818122159-417a6a69092b h1:/Lgor6hK1YRjnItUwQLfmrT2pyJ2wSq3MMlVekd/yBU=
-github.com/alanvivona/simple-vm/link v0.0.0-20200818122159-417a6a69092b/go.mod h1:BCyvJ17uB6QgRYvJTrePw5Z/xSG+KMOJyEQ5QMTK6dU=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/alanvivona/simple-vm/hardware"
 
@@ -18,6 +19,7 @@ import (
 func main() {
 	var filePath = flag.String("i", "", "Input file path")
 	var verboseMode = flag.Bool("v", false, "Verbose output")
+	var manualMode = flag.Bool("m", false, "Manual execution")
 	flag.Parse()
 
 	if verboseMode != nil && *verboseMode {
@@ -84,8 +86,13 @@ func main() {
 			break
 		}
 
-		// Wait for user input to execute next instruction
-		fmt.Scanln()
+		if manualMode != nil && (*manualMode) == true {
+			logrus.Warn("Press a key to continue execution")
+			// Wait for user input to execute next instruction
+			fmt.Scanln()
+		} else {
+			time.Sleep(100 * time.Millisecond)
+		}
 	}
 	logrus.Infof("Code execution finished")
 }

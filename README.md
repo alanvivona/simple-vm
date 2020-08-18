@@ -37,9 +37,19 @@ WIP:
 
 ## Asm + "Link" + Run a yz file inside the VM
 
-> rm ./out/*  
-> cat ../examples/test.asm | go run ../asm/main.go -v -o test.bin    
-> go run ../link/main.go -v -i test.bin -o test.yz    
+Reset the output folder:  
+> rm -rf ./out; mkdir out  
+
+Create a binary file by running the source code through the assembler:  
+> cat ./examples/sample2.asm | go run ./asm/main.go -v -o test.bin    
+
+Create an executable by using the linker:
+> go run ./link/main.go -v -i test.bin -o test.yz    
+
+Notice the difference between raw binary and executable:  
 > cat test.bin | xxd    
 > cat test.yz | xxd    
-> go run ../vm/main.go -v -i test.yz    
+You should see a checksum, magic number and header end were added to the executable.  
+
+Run the executable in the virtual machine:  
+> go run ./vm/main.go -v -i test.yz    
