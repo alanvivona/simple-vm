@@ -1,4 +1,4 @@
-# simple-vm in Golang
+# Simple VM in Golang
 I wanted to write a really simple vm just to get an idea of the inner workings of one.  
 Ended up with a fake arch, isa, assembler, dissasembler, executable file format and of course, the VM.  
 
